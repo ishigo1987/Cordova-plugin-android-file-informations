@@ -2,7 +2,8 @@
 
 ```javascript
 
-const FileInformation = window.FileInformation;
+const FileInformations = cordova.plugins.FileInformations;
+
 
 const fileUri = 'file:///path/to/your/file.txt'; // Replace with the actual file URI.
 
