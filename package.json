@@ -1,0 +1,22 @@
+{
+  "name": "cordova-plugin-file-informations",
+  "version": "0.0.1",
+  "description": "Cordova android plugin to retrieve file informations",
+  "cordova": {
+    "id": "com.app.fileinformations",
+    "platforms": []
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ishigo1987/cordova-file-informations.git"
+  },
+  "keywords": [
+    "ecosystem:cordova"
+  ],
+  "author": "Nguetseng Stephane",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ishigo1987/cordova-file-informations/issues"
+  },
+  "homepage": "https://github.com/ishigo1987/cordova-file-informations#readme"
+}

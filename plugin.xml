@@ -1,0 +1,28 @@
+
+
+
+<?xml version='1.0' encoding='utf-8'?>
+<plugin id="com.app.fileinformations" version="1.0.0" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+    <name>FileInformations</name>
+    <description>Retrieve file informations in Cordova app</description>
+    <license>MIT</license>
+    <author email="stephnguets@yahoo.fr">Your Name</author>
+
+    <engines>
+        <engine name="cordova" version=">=10.0.0" />
+    </engines>
+
+    <js-module name="FileInformations" src="www/FileInformations.js">
+        <clobbers target="cordova.plugins.FileInformations" />
+    </js-module>
+
+    <platform name="android">
+        <config-file parent="/*" target="res/xml/config.xml">
+            <feature name="FileInformations">
+                <param name="android-package" value="com.app.FileInformations.FileInformations" />
+            </feature>
+        </config-file>
+        <source-file src="src/android/FileInformations.java" target-dir="src/cordova-plugin-FileInformations/FileInformations" />
+    </platform>
+</plugin>
+
