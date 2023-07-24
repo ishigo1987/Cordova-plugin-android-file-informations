@@ -7,7 +7,7 @@ const FileInformations = cordova.plugins.FileInformations;
 
 const fileUri = 'file:///path/to/your/file.txt'; // Replace with the actual file URI.
 
-FileInformation.getFileInfo(
+FileInformation.getFileInfos(
   fileUri,
   function(fileInfo) {
     console.log('File information:', fileInfo);
