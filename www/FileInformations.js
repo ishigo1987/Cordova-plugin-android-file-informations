@@ -1,7 +1,7 @@
 const exec = require('cordova/exec');
 
 const FileInformations = {
-  getFileInfo: function(fileUri, successCallback, errorCallback) {
+  getFileInfos: function(fileUri, successCallback, errorCallback) {
         if (typeof fileUri !== 'string' || fileUri.trim() === '') {
 
             return errorCallback('Invalid file URI');
@@ -12,7 +12,7 @@ const FileInformations = {
         successCallback,
         errorCallback,
         'FileInformation',
-        'getFileInfo',
+        'getFileInfos',
         [fileUri]
         );
   }
