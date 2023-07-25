@@ -19,7 +19,7 @@
     <platform name="android">
         <config-file parent="/*" target="res/xml/config.xml">
             <feature name="FileInformations">
-                <param name="android-package" value="cordova.plugins.fileInformations.FileInformations" />
+                <param name="android-package" value="com.app.fileinformations.FileInformations" />
             </feature>
         </config-file>
         <source-file src="src/android/FileInformations.java" target-dir="src/cordova-plugin-FileInformations/FileInformations" />
