@@ -1,4 +1,4 @@
-package com.app.fileInformations; // Replace with your actual package name
+package cordova.plugins.fileInformations; // Replace with your actual package name
 
 import android.content.Context;
 import android.net.Uri;
