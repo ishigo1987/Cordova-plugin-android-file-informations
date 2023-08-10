@@ -11,7 +11,7 @@ const FileInformations = {
         return exec(
         successCallback,
         errorCallback,
-        'FileInformation',
+        'FileInformations',
         'getFileInfos',
         [fileUri]
         );
