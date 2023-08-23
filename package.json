@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Cordova android plugin to retrieve file informations",
   "cordova": {
-    "id": "com.app.fileinformations",
+    "id": "com.plugin.filemetadata",
     "platforms": []
   },
   "repository": {
