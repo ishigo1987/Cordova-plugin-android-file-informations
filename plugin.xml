@@ -27,25 +27,19 @@
 </plugin> -->
 
 
-<?xml version="1.0" encoding="UTF-8"?>
-<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-    id="com.plugin.filemetadata" 
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    version="1.0.0">
-
+<?xml version='1.0' encoding='utf-8'?>
+<plugin id="cordova-plugin-filemetadata" version="1.0.0" xmlns="http://apache.org/cordova/ns/plugins/1.0"
+    xmlns:android="http://schemas.android.com/apk/res/android">
     <name>File Metadata Plugin</name>
-    <description>Plugin to retrieve file metadata</description>
-    <license>MIT</license>
-    
-    <!-- Other plugin configurations... -->
-
+    <js-module name="filemetadata" src="www/filemetadata.js">
+        <clobbers target="window.FileMetadata" />
+    </js-module>
     <platform name="android">
-        <config-file target="res/xml/config.xml" parent="/*">
+        <config-file parent="/*" target="res/xml/config.xml">
             <feature name="FileMetadataPlugin">
                 <param name="android-package" value="com.plugin.filemetadata.FileMetadataPlugin" />
             </feature>
         </config-file>
-
         <source-file src="src/android/FileMetadataPlugin.java" target-dir="src/com/plugin/filemetadata" />
     </platform>
 </plugin>
