@@ -1,53 +1,76 @@
 package com.plugin.filemetadata;
 
-import android.util.Log;
-import org.apache.cordova.*;
+import org.apache.cordova.CallbackContext;
+import org.apache.cordova.CordovaPlugin;
+import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import android.webkit.MimeTypeMap; // Import MimeTypeMap
+
+import android.content.ContentResolver;
+import android.database.Cursor;
+import android.net.Uri;
+import android.provider.OpenableColumns;
+import android.webkit.MimeTypeMap;
 
 public class FileMetadataPlugin extends CordovaPlugin {
-
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
-        if ("getFileMetadata".equals(action)) {
-            try {
-                String filePath = args.getString(0);
-                JSONObject metadata = getFileMetadata(filePath);
+        if (action.equals("getFileMetadata")) {
+            String filePath = args.getString(0);
+            JSONObject metadata = getFileMetadata(filePath);
+            
+            if (metadata != null) {
                 callbackContext.success(metadata);
-            } catch (Exception e) {
-                callbackContext.error("Error getting file metadata: " + e.getMessage());
+            } else {
+                callbackContext.error("Error getting file metadata");
             }
+            
             return true;
         }
+        
         return false;
     }
 
-    private JSONObject getFileMetadata(String filePath) throws JSONException {
+    private JSONObject getFileMetadata(String filePath) {
         JSONObject metadata = new JSONObject();
 
         try {
-            CordovaResourceApi resourceApi = webView.getResourceApi();
-            Uri fileUri = resourceApi.remapUri(Uri.parse(filePath));
+            ContentResolver contentResolver = this.cordova.getActivity().getContentResolver();
+            Uri fileUri = Uri.parse(filePath);
+
+            // Get file name and size
+            Cursor cursor = contentResolver.query(fileUri, null, null, null, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
+                
+                if (nameIndex != -1) {
+                    String fileName = cursor.getString(nameIndex);
+                    metadata.put("name", fileName);
+                }
+                
+                if (sizeIndex != -1) {
+                    long fileSize = cursor.getLong(sizeIndex);
+                    metadata.put("size", fileSize);
+                }
+                
+                cursor.close();
+            }
+            
+            // Get mime type
             String extension = MimeTypeMap.getFileExtensionFromUrl(fileUri.toString());
             String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
-
-            CordovaResourceApi.OpenForReadResult result = resourceApi.openForRead(fileUri);
-            long fileSize = result.length;
-
-            metadata.put("filename", fileUri.getLastPathSegment());
-            metadata.put("filesize", fileSize);
-            metadata.put("mimetype", mimeType);
-
-            Log.d("FileMetadataPlugin", "File Name: " + fileUri.getLastPathSegment());
-            Log.d("FileMetadataPlugin", "File Size: " + fileSize);
-            Log.d("FileMetadataPlugin", "MIME Type: " + mimeType);
-
-        } catch (Exception e) {
-            Log.e("FileMetadataPlugin", "Error retrieving metadata: " + e.getMessage());
+            
+            if (mimeType != null) {
+                metadata.put("mime_type", mimeType);
+            }
+            
+            return metadata;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
         }
-
-        return metadata;
     }
 }
+
