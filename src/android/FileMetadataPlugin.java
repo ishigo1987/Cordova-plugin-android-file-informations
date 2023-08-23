@@ -2,6 +2,7 @@ package com.plugin.filemetadata;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
+import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -16,13 +17,17 @@ public class FileMetadataPlugin extends CordovaPlugin {
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
         if (action.equals("getFileMetadata")) {
-            String filePath = args.getString(0);
-            JSONObject metadata = getFileMetadata(filePath);
+            try {
+                String filePath = args.getString(0);
+                JSONObject metadata = getFileMetadata(filePath);
 
-            if (metadata != null) {
-                callbackContext.success(metadata);
-            } else {
-                callbackContext.error("Error getting file metadata");
+                if (metadata != null) {
+                    callbackContext.success(metadata);
+                } else {
+                    callbackContext.error("Error getting file metadata");
+                }
+            } catch (Exception e) {
+                callbackContext.error("Error: " + e.getMessage());
             }
 
             return true;
@@ -55,20 +60,14 @@ public class FileMetadataPlugin extends CordovaPlugin {
                 }
 
                 cursor.close();
-            } else {
-                // Handle case where file information is not available
-                return null;
             }
 
             // Get mime type
-            String extension = MimeTypeMap.getFileExtensionFromUrl(fileUri.toString());
+            String extension = MimeTypeMap.getFileExtensionFromUrl(filePath);
             String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
 
             if (mimeType != null) {
                 metadata.put("mime_type", mimeType);
-            } else {
-                // Handle case where mime type is not available
-                return null;
             }
 
             return metadata;
