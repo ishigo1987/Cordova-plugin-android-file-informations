@@ -2,7 +2,6 @@ package com.plugin.filemetadata;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
-import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,16 +18,16 @@ public class FileMetadataPlugin extends CordovaPlugin {
         if (action.equals("getFileMetadata")) {
             String filePath = args.getString(0);
             JSONObject metadata = getFileMetadata(filePath);
-            
+
             if (metadata != null) {
                 callbackContext.success(metadata);
             } else {
                 callbackContext.error("Error getting file metadata");
             }
-            
+
             return true;
         }
-        
+
         return false;
     }
 
@@ -44,28 +43,34 @@ public class FileMetadataPlugin extends CordovaPlugin {
             if (cursor != null && cursor.moveToFirst()) {
                 int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
                 int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
-                
+
                 if (nameIndex != -1) {
                     String fileName = cursor.getString(nameIndex);
                     metadata.put("name", fileName);
                 }
-                
+
                 if (sizeIndex != -1) {
                     long fileSize = cursor.getLong(sizeIndex);
                     metadata.put("size", fileSize);
                 }
-                
+
                 cursor.close();
+            } else {
+                // Handle case where file information is not available
+                return null;
             }
-            
+
             // Get mime type
             String extension = MimeTypeMap.getFileExtensionFromUrl(fileUri.toString());
             String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
-            
+
             if (mimeType != null) {
                 metadata.put("mime_type", mimeType);
+            } else {
+                // Handle case where mime type is not available
+                return null;
             }
-            
+
             return metadata;
         } catch (JSONException e) {
             e.printStackTrace();
@@ -73,4 +78,3 @@ public class FileMetadataPlugin extends CordovaPlugin {
         }
     }
 }
-
