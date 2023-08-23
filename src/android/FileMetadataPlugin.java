@@ -1,66 +1,53 @@
 package com.plugin.filemetadata;
 
-import org.apache.cordova.CallbackContext;
-import org.apache.cordova.CordovaPlugin;
-import org.apache.cordova.PluginResult;
+import android.util.Log;
+import org.apache.cordova.*;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.File;
+import android.webkit.MimeTypeMap; // Import MimeTypeMap
 
 public class FileMetadataPlugin extends CordovaPlugin {
 
     @Override
-    public boolean execute(String action, JSONArray args, final CallbackContext callbackContext) throws JSONException {
+    public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
         if ("getFileMetadata".equals(action)) {
-            final String filePath = args.getString(0);
-            
-            cordova.getThreadPool().execute(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        JSONObject metadata = getMetadata(filePath);
-                        callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, metadata));
-                    } catch (Exception e) {
-                        callbackContext.error("Error getting file metadata: " + e.getMessage());
-                    }
-                }
-            });
-            
+            try {
+                String filePath = args.getString(0);
+                JSONObject metadata = getFileMetadata(filePath);
+                callbackContext.success(metadata);
+            } catch (Exception e) {
+                callbackContext.error("Error getting file metadata: " + e.getMessage());
+            }
             return true;
         }
         return false;
     }
 
-    private JSONObject getMetadata(String filePath) throws Exception {
-        File file = new File(filePath);
-        
-        String mimeType = getMimeType(file);
-        String fileName = file.getName();
-        long fileSize = file.length();
-        
+    private JSONObject getFileMetadata(String filePath) throws JSONException {
         JSONObject metadata = new JSONObject();
-        metadata.put("mimeType", mimeType);
-        metadata.put("fileName", fileName);
-        metadata.put("fileSize", fileSize);
+
+        try {
+            CordovaResourceApi resourceApi = webView.getResourceApi();
+            Uri fileUri = resourceApi.remapUri(Uri.parse(filePath));
+            String extension = MimeTypeMap.getFileExtensionFromUrl(fileUri.toString());
+            String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+
+            CordovaResourceApi.OpenForReadResult result = resourceApi.openForRead(fileUri);
+            long fileSize = result.length;
+
+            metadata.put("filename", fileUri.getLastPathSegment());
+            metadata.put("filesize", fileSize);
+            metadata.put("mimetype", mimeType);
+
+            Log.d("FileMetadataPlugin", "File Name: " + fileUri.getLastPathSegment());
+            Log.d("FileMetadataPlugin", "File Size: " + fileSize);
+            Log.d("FileMetadataPlugin", "MIME Type: " + mimeType);
+
+        } catch (Exception e) {
+            Log.e("FileMetadataPlugin", "Error retrieving metadata: " + e.getMessage());
+        }
+
         return metadata;
-    }
-    
-    private String getMimeType(File file) {
-        String mimeType = null;
-        String extension = getFileExtension(file.getName());
-        if (extension != null) {
-            mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
-        }
-        return mimeType;
-    }
-    
-    private String getFileExtension(String fileName) {
-        int dotIndex = fileName.lastIndexOf(".");
-        if (dotIndex > 0 && dotIndex < fileName.length() - 1) {
-            return fileName.substring(dotIndex + 1).toLowerCase();
-        }
-        return null;
     }
 }
